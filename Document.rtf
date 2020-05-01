@@ -6895,6 +6895,52 @@ be00090100000000be000901000000002800000009010000be0000000100080000000000000000
 \pard\sa200\sl240\slmult1\tab The operating system determines the \ul\i exact time\ulnone\i0  that a task is \tab allowed to run by configuring a hardware timer to \tab send an \tab interrupt after that time.\par
 
 \pard\sa200\sl276\slmult1\par
+Rust does support to preemptive multitasking in the form of \b asynch/.await. \b0 These are rust's built-in tools.\par
+asynch tronsforms the code into state machine. The state machine implements \b Future\b0  trait.\par
+We create a asynchronous function using syntax \b  asynch fn .\par
+\b0 It returns a Function called \b Future \b0 which needs an \b executor\b0  to run.\par
+lets try this in below given example code;\par
+
+\pard\li720\sa200\sl276\slmult1 use futures::executor::block_on;\par
+async fn hello_world() \{\par
+    println!("hello, world!");\par
+\}\par
+fn main() \{\par
+    let future = hello_world();       // Nothing is printed\par
+    block_on(future);       // `future` is run and "hello, world!" is printed\par
+\}\par
+
+\pard\sa200\sl276\slmult1\par
+In the main function we used block_on() executor to start the asynch function and the value printed.\par
+block_on() blocks current thread until the provided Future runs and complete . We can use .await instead of block_on() to let the Futures returned by other asynch Fuctions run and complete. \par
+let try this in below given example code; \par
+\par
+
+\pard\li720\sa200\sl276\slmult1 async fn learn_song() -> Song \{  ...  \}\par
+async fn sing_song(song: Song) \{  ...  \}\par
+async fn dance() \{ ..........\}\par
+\par
+async fn learn_and_sing() \{\par
+    let song = learn_song().await;\par
+    sing_song(song).await;\par
+\}\par
+async fn async_main() \{\par
+    let f1 = learn_and_sing();\par
+    let f2 = dance();\par
+\par
+    futures::join!(f1, f2);\par
+\}\par
+\par
+fn main() \{\par
+    block_on(async_main());\par
+\}\par
+
+\pard\sa200\sl276\slmult1\b join!\b0  is like \b .await\b0  but can wait for multiple futures concurrently.\par
+If we're temporarily blocked in the \b learn_and_sing\b0  future, the \b dance \b0    future will take over the current thread. If \b dance\b0  becomes blocked, \b learn_and_sing\b0  can take back over.\par
+ If both futures are blocked, then async_main is blocked and will yield to the executor.\par
+If we used \b block_on(learn_song())\b0  rather than \b learn_song().await\b0  in \b learn_and_sing\b0 , the thread wouldn't be able to do anything else while \b learn_song\b0  was running.\par
+By \b .await\b0 -ing the \b learn_song\b0  future, we allow other tasks to take over the current thread if \b learn_song\b0  is blocked. This makes it possible to run multiple futures to completion concurrently on the same thread.\par
+\par
 \fs22\par
 }
  
