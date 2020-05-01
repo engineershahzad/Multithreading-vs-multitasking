@@ -5523,6 +5523,26 @@ for received in rx \{\par
 \}\par
 
 \pard\sa200\sl276\slmult1\tab\}\par
+
+\pard\sa200\sl240\slmult1 We created a new channel using the \b\i mpsc::channel\b0\i0  function.\par
+This function returns a tuple. First element of this this tuple is sending end i.e. \ul\i Transmitter\ulnone\i0  and the second element is recieving end i.e. \ul\i Reciever.\ulnone\b  \b0\i0 Transmitter and Reciever are abbreviated as \b\i tx \b0\i0 and \b\i rx\b0\i0  traditionally.\par
+we used \b\i thread::spawn\b0\i0  to create a new thread and then used \b\i move\b0\i0  to move \b\i tx\b0\i0  into the closure so the spawned thread owns \b\i tx\b0\i0  The spawned thread needs to own the transmitting end of the channel to be able to send messages through the channel.\par
+The \ul\i spawned thread\ulnone\b  \b0\i0 has a vector of strings that we want to send to the main thread. We iterate over them, sending each individually, and pause between each by calling the \b\i thread::sleep\b0\i0  function with a \b\i Duration\b0\i0  value of \b 1\b0  second.\par
+We used \b\i clone \b0\i0 on the sending end of the channel. It gave us a \ul\i sending handle\ulnone\i0 . We passed this handle to the \ul\i first\ulnone\i0  thread and we passed the \ul\i original\ulnone\i0  sending end of the channel to second thread. By this we got two threads sending differnt messages to reciever.\par
+we treated the \b\i rx \b0\i0 as iterator and printed recived values. This gave us the following output:\par
+
+\pard\li720\sa200\sl240\slmult1 Got: hi\par
+Got: more\par
+Got: from\par
+Got: messages\par
+Got: for\par
+Got: the\par
+Got: thread\par
+Got: you\par
+
+\pard\sa200\sl240\slmult1 The order of printed values depend on system\par
+
+\pard\sa200\sl276\slmult1\par
 \fs22\par
 }
  
